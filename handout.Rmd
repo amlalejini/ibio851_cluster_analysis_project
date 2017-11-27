@@ -1,0 +1,181 @@
+---
+title: "Cluster Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Authors: Miranda Wade, Matthew Andres Moreno, Alexander Lalejini, and Nate Davis
+
+TODOs:
+* Linkify shit.
+* Add in more citations. 
+* In-text citations + references.
+* Add in link to clustering demo
+
+##A (Brief) Introduction to Cluster Analysis
+Cluster analysis is a type of machine learning that attempts to divide or organize data into groups (*i.e.* clusters) such that data objects (*i.e.* data points, observations, *etc.*) within a particular cluster are more similar to one another than to data objects in other clusters [CITE: Tan]. Cluster analysis is often used to automatically categorize unlabeled data, to infer relationships within data, or to summarize data, reducing a large data set down to a few representative clusters [CITE: Tan]. 
+
+<TODO: Maybe examples here> 
+
+There are many cluster analysis techniques. Different approaches provide different ways of grouping data together, and different cluster analysis technqies may be more or less appropriate for grouping certain types of data. Below, we explain and demonstrate three different cluster analysis techniques: protype-based clustering, hierarchical clustering, and density-based clustering. 
+
+##Cluster Analysis Techniques
+In this section, we'll explore three cluster analysis techniques: prototype-based clustering, hierarchical clustering, and density-based clustering. We will provide an overview of each technique and an algorithmic explanation along with a from-scratch R implementation of each technique. Once we've taken a peek under the hood of each of these three clustering techniques, we'll present a canned (*i.e.* already existing) R function/package capable of doing all of the heavy lifting for you right out of the box!
+
+**Disclaimer**: Our from-scratch implementations are meant as demonstrative examples. Thus, our code is implemented to maximize understandability *not* efficiency. 
+
+###Prototype-based Clustering
+####Overview
+In prototype-based clustering, a cluster is defined by a representative *prototype* object where each member of a cluster is more similar to that cluster's prototype than to any other cluster's prototype [CITE]. But, what exactly is a prototype object? 
+
+If the data being clustered is numeric, the prototype is often the centroid (i.e. the center or average) of all of the cluster members [CITE: kumar dm textbook]. For example, if we had the following two clusters of numeric data points:
+
+```{r}
+cluster_1 <- c(10, 7, 10, 11, 9)
+cluster_2 <- c(23, 22, 19, 22, 21)
+```
+
+The cluster prototypes would be their centroids:
+```{r}
+cluster_1.prototype <- mean(cluster_1)
+cluster_2.prototype <- mean(cluster_2)
+```
+ * Cluster 1 prototype = `r cluster_1.prototype`
+ * Cluster 2 prototype = `r cluster_2.prototype`
+
+If the data is not numeric, the appropriate kind of prototype will depend on the data you are clustering. The prototype should be as representative as possible of the cluster members, and you should be able to calculate distance between any given cluster prototype and any given data point.
+
+For example, if we were clustering a list of three letter words together based on their spelling, one of our clusters might look like:
+```{r}
+word_cluster <- c("dog", "doc", "dot", "bog", "log")
+```
+
+We might say the prototype of that cluster is a three letter word (not necessarily a *real* word that shows up in our list) where each character position in the prototype is the most abundant character at that position among all of the cluster's member words. With this definition of a prototype, `"dog"` would be our example cluster's prototype. In case you're wondering how one might compute distances between sequences of characters (useful for clustering DNA sequences), you could use the [edit distance](https://en.wikipedia.org/wiki/Edit_distance) metric. 
+
+####Requirements
+ * You must be able to define a prototype given an arbitrary grouping of the data you are clustering.
+ * You must be able to compute a measure of either similarity or dissimilarity between prototypes and data points. 
+
+####Coding From Scratch
+Here, we demonstrate a basic implementation of the K-means algorithm, which is one of the most commonly used algorithms for prototype-based clustering. It makes for a nice introduction to prototype-based clustering as it's fairly simple and intuitive. 
+
+The K-means clustering algorithm makes several assumptions that we'll need to be aware of:
+
+ * *A priori* knowledge of the number of clusters in your data. Note: you can relax this assumption by making use of a variety of techniques that estimate the most appropriate number clusters in your data. We will not cover these techniques here, but more information can be found [TODO: CITE]. 
+ * You are capable of computing the mean of a grouping of data. 
+ * You are capable of computing the distance between a data point and a prototype.
+ * Clusters should be relatively globular (*e.g.* normally distributed around a central point). 
+
+For our demonstration, we'll generate some 2-dimentional numeric data:
+```{r}
+c.size <- 100
+c1.true <- c(16, 128)
+c2.true <- c(128, 16)
+c3.true <- c(128, 128)
+c1.gen <- cbind(rnorm(c.size, mean=c1.true[1], sd=8), rnorm(c.size, mean=c1.true[2], sd=8))
+c2.gen <- cbind(rnorm(c.size, mean=c2.true[1], sd=8), rnorm(c.size, mean=c2.true[2], sd=8))
+c3.gen <- cbind(rnorm(c.size, mean=c3.true[1], sd=8), rnorm(c.size, mean=c3.true[2], sd=8))
+
+kmeans.data <- rbind(c1.gen, c2.gen, c3.gen)
+plot(kmeans.data)
+```
+
+Okay, so we have some data to cluster. Let's get started with our K-means implementation. First, we need to do a little setup: we need to define our distance function, and we need to define the parameter k -- the number of clusters to find.
+
+```{r}
+euclidean.distance.2d <- function(a, b) {  return(sqrt((a[1] - b[1])**2 + (a[2] - b[2])**2)) }
+
+k <- 3
+```
+
+Step 1: Randomly assign each data point to a cluster.
+```{r}
+# To do this, we can shuffle our data around then assign the first third of the data to cluster 1, the second third 
+# to cluster 2, and the last third of the data to cluster 3. 
+kmeans.data <- kmeans.data[sample(nrow(kmeans.data)),] 
+cluster.ids <- rep(1:3, rep(nrow(kmeans.data)/k, k))
+cluster.centroids <- rep(0, k)
+```
+Let's take a look at how our randomly initialized clusters look (where colors indicate cluster membership): 
+```{r echo=FALSE}
+plot(kmeans.data, col=cluster.ids)
+```
+
+We'll the following steps until the algorithm converges: update cluster centroids, then reassign data points to the nearest cluster centroid. In this way, we'll iteratively refine our clusters. 
+
+```{r}
+while (TRUE) {
+  # Step 2: Update cluster centroids.
+  c.sizes <- rep(0, k)                   # Used to keep track of cluster sizes.
+  c.totals <- matrix(0, nrow=k, ncol=2)  # Used to keep track of cluster magnitudes (intermediate step in computing centroids)
+  for (j in 1:length(cluster.ids)) {
+    c.id <- cluster.ids[j]
+    c.sizes[c.id] <- c.sizes[c.id] + 1
+    c.totals[c.id,1] <- c.totals[c.id,1] + kmeans.data[j,1]
+    c.totals[c.id,2] <- c.totals[c.id,2] + kmeans.data[j,2]
+  }
+  # Compute centroids.
+  cluster.centroids <- c.totals / c.sizes
+  
+  # Step 3: Reassign data points to cluster with closest centroid.
+  # If nothing changes, we'll say that clustering has converged.
+  something_changed <- FALSE
+  for (j in 1:length(cluster.ids)) {
+    min_dist <- Inf
+    c.id <- 0
+    for (c in 1:k) {
+      dist <- euclidean.distance.2d(kmeans.data[j,], cluster.centroids[c,])
+      if (dist < min_dist) {
+        min_dist <- dist
+        c.id <- c
+      }
+    }
+    if (c.id != cluster.ids[j]) { something_changed <- TRUE }
+    cluster.ids[j] <- c.id
+  }
+  if (!something_changed) { break }
+}
+```
+
+Let's take a look at the results of our clustering (where colors indicate cluster membership):
+```{r echo=FALSE}
+plot(kmeans.data, col=cluster.ids)
+```
+
+####Coding From the Can
+R has a built-in K-means clustering function called `kmeans`. To cluster our generated data with the built-in K-means function, we would:
+```{r}
+kmeans.cluster <- kmeans(kmeans.data, k, 1000)
+plot(kmeans.data, col=kmeans.cluster[["cluster"]])
+```
+
+
+###Hierarchical Clustering
+####Overview
+Using a hierarchical clustering analysis approach will produce hierarchical groupings of your data. For example, hierarchical cluster analysis can be used to infer phylogenetic relationships among species because a phylogenetic tree is simply a hirarchical grouping of species where the groupings are based on genetic relatedness [CITE EXAMPLE]. 
+
+There are two types of hierarchical clustering approaches: agglomerative and divisive. Agglomerative hierarchical clustering is a bottom up approach where each observation (*i.e.* data point) is initially a single cluster, and clusters are iteratively merged until there is only a single cluster remaining that contains all of the data [CITE]. Divisive hierarchical clustering is a top down approach where all observations begin as a single cluster, and clusters are iteratively divided until each cluster has a size of one [CITE]. 
+
+####Requirements
+ * Agglomerative hierarchical clustering
+     * Requires a mechanism for merging two clusters together, which often requires a way to compute a similarity or dissimilarity score between two clusters of arbitrary size.
+ * Divisive hierarchical clustering
+     * Requires a mechanism for dividing a single cluster of size greater than one into two or more smaller clusters. 
+     
+####Coding From Scratch
+Here, we demonstrate a simple implementation of agglomerative hierarchical clustering. We will merge clusters based on cluster dissimilarity scores; when we merge clusters, we will merge the two clusters with the minimum dissimilarity score where the dissimilarity score is defined as the minimum distance between any two points in two different clusters [CITE]. 
+
+
+
+####Coding From the Can
+
+###Density-based Clustering
+####Overview
+####Requirements
+####Coding From Scratch
+####Coding From the Can
+
+##References
