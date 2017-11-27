@@ -14,23 +14,22 @@ TODOs:
  * Linkify shit.
  * Add in more citations. 
  * In-text citations + references.
- * Add in link to clustering demo
 
 ##A (Brief) Introduction to Cluster Analysis
-Cluster analysis is a type of machine learning that attempts to divide or organize data into groups (*i.e.* clusters) such that data objects (*i.e.* data points, observations, *etc.*) within a particular cluster are more similar to one another than to data objects in other clusters [CITE: Tan]. Cluster analysis is often used to automatically categorize unlabeled data, to infer relationships within data, or to summarize data, reducing a large data set down to a few representative clusters [CITE: Tan]. 
+Cluster analysis is a type of machine learning that attempts to divide or organize data into groups (*i.e.* clusters) such that data objects (*i.e.* data points, observations, *etc.*) within a particular cluster are more similar to one another than to data objects in other clusters (Tan *et al.*, 2005). Cluster analysis is often used to automatically categorize unlabeled data, to infer relationships within data, or to summarize data, reducing a large data set down to a few representative clusters (Tan *et al.*, 2005). 
 
 <TODO: Maybe examples here> 
 
-There are many cluster analysis techniques. Different approaches provide different ways of grouping data together, and different cluster analysis technqies may be more or less appropriate for grouping certain types of data. Below, we explain and demonstrate (in R) three different cluster analysis techniques: prototype-based clustering, hierarchical clustering, and density-based clustering. 
+There are many cluster analysis techniques. Different approaches provide different ways of grouping data together, and different cluster analysis technqies may be more or less appropriate for grouping certain types of data. Below, we explain and demonstrate, in R (R Core Team, 2013), three different cluster analysis techniques: prototype-based clustering, hierarchical clustering, and density-based clustering. 
 
 ##Cluster Analysis Techniques
 In this section, we explore prototype-based clustering, hierarchical clustering, and density-based clustering. We  provide an overview of each technique along with a canned (*i.e.* already existing) R function/package capable of doing all of the heavy cluster analysis for you right out of the box! Additionally, we'll take a peek under the hood of the K-means prototype-based clustering algorithm by stepping through a from-scratch R implementation. 
 
 ###Prototype-based Clustering
 ####Overview
-In prototype-based clustering, a cluster is defined by a representative *prototype* object where each member of a cluster is more similar to that cluster's prototype than to any other cluster's prototype [CITE]. But, what exactly is a prototype object? 
+In prototype-based clustering, a cluster is defined by a representative *prototype* object where each member of a cluster is more similar to that cluster's prototype than to any other cluster's prototype (Tan *et al.*, 2005). But, what exactly is a prototype object? 
 
-If the data being clustered is numeric, the prototype is often the centroid (i.e. the center or average) of all of the cluster members [CITE: kumar dm textbook]. For example, if we had the following two clusters of numeric data points:
+If the data being clustered is numeric, the prototype is often the centroid (i.e. the center or average) of all of the cluster members (Tan *et al.*, 2005). For example, if we had the following two clusters of numeric data points:
 
 ```{r}
 cluster_1 <- c(10, 7, 10, 11, 9)
@@ -59,7 +58,7 @@ We might say the prototype of that cluster is a three letter word (not necessari
  * You must be able to compute a measure of either similarity or dissimilarity between prototypes and data points. 
 
 ####Coding From Scratch
-Here, we demonstrate a basic implementation of the K-means algorithm, which is one of the most commonly used algorithms for prototype-based clustering. It makes for a nice introduction to prototype-based clustering as it's fairly simple and intuitive. 
+Here, we demonstrate a basic implementation of the K-means algorithm, which is one of the most commonly used algorithms for prototype-based clustering. It makes for a nice introduction to prototype-based clustering as it's fairly simple and intuitive. Additionally, if you'd like to play with an interactive web-demo of the K-means clustering algorithm, check out this demo we put together: [http://cse.msu.edu/~lalejini/IBIO851/kmeans_clustering.html](http://cse.msu.edu/~lalejini/IBIO851/kmeans_clustering.html)
 
 **Disclaimer**: Our from-scratch implementation is meant as a demonstrative example. Thus, our code is implemented to maximize understandability *not* necessarily efficiency. 
 
@@ -105,7 +104,7 @@ Let's take a look at how our randomly initialized clusters look (where colors in
 plot(kmeans.data, col=cluster.ids)
 ```
 
-We'll the following steps until the algorithm converges: update cluster centroids, then reassign data points to the nearest cluster centroid. In this way, we'll iteratively refine our clusters. 
+We'll repeat the following steps until the algorithm converges: update cluster centroids, then reassign data points to the nearest cluster centroid. In this way, we'll iteratively refine our clusters. 
 
 ```{r}
 while (TRUE) {
@@ -159,9 +158,9 @@ The hierarchical clustering analysis produces hierarchical groupings of data. Fo
 
 There are two types of hierarchical clustering approaches: divisive and agglomerative. 
 
-**Divisive hierarchical clustering** is a top down approach where all observations begin as a single cluster, and clusters are iteratively divided until each cluster has a size of one [CITE]. 
+**Divisive hierarchical clustering** is a top down approach where all observations begin as a single cluster, and clusters are iteratively divided until each cluster has a size of one (Tan *et al.*, 2005). 
 
-**Agglomerative hierarchical clustering** is a bottom up approach where each observation (*i.e.* data point) is initially a single cluster, and clusters are iteratively merged until there is only a single cluster remaining that contains all of the data [CITE]. Agglomerative hierarchical clustering is typically computationally less expensive than divisive hierarchical clustering; thus, it is used more often. For example, the built-in hierarchical clustering function in R implements agglomerative hierarchical clustering. 
+**Agglomerative hierarchical clustering** is a bottom up approach where each observation (*i.e.* data point) is initially a single cluster, and clusters are iteratively merged until there is only a single cluster remaining that contains all of the data (Tan *et al.*, 2005). Agglomerative hierarchical clustering is typically computationally less expensive than divisive hierarchical clustering; thus, it is used more often. For example, the built-in hierarchical clustering function in R implements agglomerative hierarchical clustering. 
 
 ####Requirements
  * Agglomerative hierarchical clustering
@@ -232,3 +231,14 @@ Thus, if you're working with unlabeled data, internal evaluation is the way to g
 For both internal and external evaluation, several different metrics exist. In order to actually perform internal or external evaluation, you will need to select a particular metric to work with (or try several). [Wikipedia](https://en.wikipedia.org/wiki/Cluster_analysis#Evaluation_and_assessment) is a great starting point for this. 
 
 ##References
+Kaufman, L., & Roussew, P. J. (1990). Finding Groups in Data - An Introduction to Cluster Analysis. A Wiley-Science Publication John Wiley & Sons.
+
+Nandi, Manojit. (2015). Density-Based Clustering. Domino Data Lab
+
+R Core Team (2013). R: A language and environment for statistical computing.
+
+Tan, Pang-Ning, Michael Steinbach, and Vipin Kumar. (2005). Introduction to data mining. Boston: Pearson Addison Wesley.
+
+
+
+
