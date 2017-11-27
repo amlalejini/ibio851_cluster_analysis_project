@@ -252,6 +252,37 @@ Once we have all of our data points labeled as core, border, or outlier, we can 
 #### Coding From the Can
 The DBSCAN R package contains a convenient implementation of the DBSCAN density-based cluster analysis algorithm.
 
+```{r}
+require(dbscan)
+library(dbscan)
+```
+
+Let's generate some data that a density-based approach will have no problem clustering but might trip up the previous two clustering approaches that we've discussed.
+```{r}
+# y = 0.5x
+x <- seq(from=1, to=100, by=0.1)
+e <- rnorm(length(x), 0, 1)
+y.1 <- x + e
+y.2 <- y.1 + 25
+
+dbscan.data <- rbind(cbind(x, y.1), cbind(x, y.2))
+plot(dbscan.data)
+```
+
+Now, we'll use the `dbscan` function to cluster the data we've generated, and we'll plot the results where color represents cluster membership:
+```{r}
+dbscan.clusters <- dbscan(dbscan.data, eps=5, minPts=5)
+plot(dbscan.data, col=dbscan.clusters$cluster)
+```
+
+For comparison, let's run K-means on the data we just clustered.
+```{r}
+comparison.clusters <- kmeans(dbscan.data, 2, 1000)
+plot(dbscan.data, col=comparison.clusters[["cluster"]])
+```
+
+As expected, K-means can't handle our non-globular data!
+
 ##Assessing Cluster Quality
 The quality of a clustering decision can be assessed in two main ways:
 
