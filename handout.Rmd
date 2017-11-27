@@ -170,16 +170,45 @@ There are two types of hierarchical clustering approaches: divisive and agglomer
      * Requires a mechanism for dividing a single cluster of size greater than one into two or more smaller clusters. 
 
 ####Coding From the Can
-Let's generate some data to cluster hierarchically. To keep things simple, we'll stick to the data we generated for our K-means example.
+R has a built-in (agglomerative) hierarchical clustering function called `hclust`.
+
+Let's generate some data to cluster hierarchically. To keep things simple, we'll generate some 1-dimensional numeric data.
 ```{r}
-hclust.data <- kmeans.data#rnorm(100, floor(runif(5, 1, 100)), 10)
+# This should give us three normally distributed clusters where each cluster's mean is uniformally distributed between 1 and 100 with a sd of 10.
+hclust.data <- floor(rnorm(10, floor(runif(3, 1, 100)), 10))
 ```
 
-Okay, to make things easier, let's pre-calculate the full pair-wise dissimilarity for all of our data using the built-in dist function.
+Unlike the built-in `kmeans` function, the built-in `hclust` function does not take your data as input directly. Rather, it requires a dissimilarity structure, which is just a matrix of pairwise dissimilarity scores between all of your observations/data points. R has a nice built-in function to do this for us: `dist`. 
+```{r}
+# We'll provide our data and that we'd like to use euclidean distance.
+dissim.mat <- dist(hclust.data, method="euclidean")
+```
+
+Now that we have our dissimilarity structure, we can plug that right into the `hclust` function.
+```{r}
+hclusters <- hclust(dissim.mat)
+```
+
+We can check out our results in dendrogram form:
+```{r}
+plot(hclusters, labels=as.character(hclust.data))
+```
+
+I meantioned that hierarical clustering used to infer relationships between character sequences such as DNA sequences. Our above example relies on the `dist` function, which operates on numeric data, to produce our dissimilarity matrix. What if our data is a list of character sequences?
+```{r}
+hclust.data.char <- c("dog", "doc", "log", "blog", "cat", "category", "statistics")
+```
+
+Instead of using the `dist` function to compute the pairwise euclidean distance between all of our words, we can use the `adist` function to compute a dissimilarity matrix for character sequeces where each pairwise dissimilarity score between two sequences is the [edit (also known as Levenshtein) distance](https://en.wikipedia.org/wiki/Edit_distance) between the two sequences.
 
 ```{r}
+dissim.mat.char <- adist(hclust.data.char)
+```
 
-dissim.mat <- dist(hclust.data)
+Now let's do some clustering and check out the results!
+```{r}
+hclusters.char <- hclust(as.dist(dissim.mat.char))
+plot(hclusters.char, labels=hclust.data.char)
 ```
 
 ###Density-based Clustering
