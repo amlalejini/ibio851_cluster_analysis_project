@@ -217,4 +217,18 @@ plot(hclusters.char, labels=hclust.data.char)
 ####Coding From Scratch
 ####Coding From the Can
 
+##Assessing Cluster Quality
+The quality of a clustering decision can be assessed in two main ways:
+
+ 1. **Internal Evaluation**: assess the extent to which data points within *the same* predicted cluster are similar to one another, and assess how different data points within *different* predicted clusters are to one another.  
+ 2. **External Evaluation**: assess the ability of clustering results to predict a set of known classes underlying the data. 
+ 
+It is important to note that internal evaluation does not measure the ability of a clustering algorithm to cluster data in a way that reflects the ground truth classification scheme (*i.e.* the ability to create *valid* clusters). Instead, it measures the ability of a clustering algorithm to create, essentially, nicely clumped clusters that are clearly resolved from one another. 
+
+Similarly, it should be noted that external evaluation assumes some known underlying class scheme that we expect to be reflected in the observed data clusters (*i.e.* data points from the same explanatory class tend to cluster together). The set of known classifications might come from data labels (*e.g.* if you're performing genetic clustering, this might be a set of distinct locations organisms were sampled from) or might be human annotated post-hoc based on what an expert manually determines to be valid clusters. Without these class labels, though, external evaluation cannot be performed. 
+
+Thus, if you're working with unlabeled data, internal evaluation is the way to go. This is especially useful if you're tuning the parameters of your clustering algorithm on unlabeled daata and trying to determine how many clusters exist in the first place. You might use internal evaluation to evaluate how neatly known data labels clump together, too. if you want to assess the ability of the clustering process to reflect a certain ground truth, use an external evaluation scheme. 
+
+For both internal and external evaluation, several different metrics exist. In order to actually perform internal or external evaluation, you will need to select a particular metric to work with (or try several). [Wikipedia](https://en.wikipedia.org/wiki/Cluster_analysis#Evaluation_and_assessment) is a great starting point for this. 
+
 ##References
