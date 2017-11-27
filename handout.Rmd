@@ -9,14 +9,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Authors: Miranda Wade, Matthew Andres Moreno, Alexander Lalejini, and Nate Davis
 
-TODOs:
-
- * Add in more citations.
-
 ##A (Brief) Introduction to Cluster Analysis
 Cluster analysis is a type of machine learning that attempts to divide or organize data into groups (*i.e.* clusters) such that data objects (*i.e.* data points, observations, *etc.*) within a particular cluster are more similar to one another than to data objects in other clusters (Tan *et al.*, 2005). Cluster analysis is often used to automatically categorize unlabeled data, to infer relationships within data, or to summarize data, reducing a large data set down to a few representative clusters (Tan *et al.*, 2005). 
-
-<TODO: Maybe examples here>
 
 There are many cluster analysis techniques. Different approaches provide different ways of grouping data together, and different cluster analysis technqies may be more or less appropriate for grouping certain types of data. Below, we explain and demonstrate, in R (R Core Team, 2013), three different cluster analysis techniques: prototype-based clustering, hierarchical clustering, and density-based clustering. 
 
@@ -61,7 +55,7 @@ Here, we demonstrate a basic implementation of the K-means algorithm, which is o
 
 The K-means clustering algorithm makes several assumptions that we'll need to be aware of:
 
- * *A priori* knowledge of the number of clusters in your data. Note: you can relax this assumption by making use of a variety of techniques that estimate the most appropriate number clusters in your data. We will not cover these techniques here, but more information can be found [TODO: CITE].
+ * *A priori* knowledge of the number of clusters in your data. Note: you can relax this assumption by making use of a variety of techniques that estimate the most appropriate number clusters in your data. We will not cover these techniques here, but more information can be found (Tan *et al.*, 2005).
  * You are capable of computing the mean of a grouping of data.
  * You are capable of computing the distance between a data point and a prototype.
  * Clusters should be relatively globular (*e.g.* normally distributed around a central point).
@@ -152,7 +146,7 @@ plot(kmeans.data, col=kmeans.cluster[["cluster"]])
 
 ###Hierarchical Clustering
 ####Overview
-The hierarchical clustering analysis produces hierarchical groupings of data. For example, hierarchical cluster analysis can be used to infer phylogenetic relationships among species, as a phylogenetic tree is simply a hirarchical grouping of species where the groupings are based on genetic relatedness [CITE EXAMPLE].
+The hierarchical clustering analysis produces hierarchical groupings of data. For example, hierarchical cluster analysis can be used to infer phylogenetic relationships among species, as a phylogenetic tree is simply a hirarchical grouping of species where the groupings are based on genetic relatedness (Saitou and Nei, 1987).
 
 There are two types of hierarchical clustering approaches: divisive and agglomerative.
 
@@ -280,5 +274,7 @@ Kaufman, L., & Roussew, P. J. (1990). Finding Groups in Data - An Introduction t
 Nandi, Manojit. (2015). Density-Based Clustering. Domino Data Lab
 
 R Core Team (2013). R: A language and environment for statistical computing.
+
+Saitou, N., & Nei, M. (1987). The neighbor-joining method: a new method for reconstructing phylogenetic trees. Molecular biology and evolution, 4(4), 406-425.
 
 Tan, Pang-Ning, Michael Steinbach, and Vipin Kumar. (2005). Introduction to data mining. Boston: Pearson Addison Wesley.
