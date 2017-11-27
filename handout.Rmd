@@ -212,10 +212,53 @@ plot(hclusters.char, labels=hclust.data.char)
 ```
 
 ###Density-based Clustering
+
 ####Overview
-####Requirements
-####Coding From Scratch
-####Coding From the Can
+In density-based clustering, a cluster is defined as a high density region of data that is surrounded by a low density region of data [4]. While density might be a strange concept to apply to many types of data outside of spatial data, it really is quite intuitive and is best demonstrated visually.
+
+Density-based clustering deals well with irregular and non-globular data (unlike the other approaches we’ve discussed so far) and is less impacted by noise and outliers [4].
+
+In this presentation of density-based clustering, we’ll focus on a particular representative density-based clustering algorithm called DBSCAN (stands for density-based spatial clustering of applications with noise)  {cite Ester et. al, 1996}. Other density-based clustering algorithms that follow the same general idea (but with important differences!) exist, notably OPTICS, DENCLUE, STING, and CLIQUE.
+
+#### DBSCAN Approach
+
+DBSCAN works by sorting data points into three categories:
+1. core points,
+2. border points, and
+3. outliers.
+
+Core points, intuitively, are the points in the middle of a dense cluster. Because they’re in the middle of a dense cluster they have lots of other points nearby. Border points, intuitively, are the points at the edge of a dense cluster. Because they’re on the edge, they don’t have as many other points nearby. However, they are nearby to at least one core point. Finally, outliers, aren’t close to lots of other points like a core point or close to a core point like a border point.
+
+This image shows an example of outlier, border, and core points in context.
+
+![](https://bradzzz.gitbooks.io/ga-seattle-dsi/content/dsi/dsi_07_unsupervised_learning/4.2-lesson/assets/images/dbscan.png)
+
+{cite https://bradzzz.gitbooks.io/ga-seattle-dsi/content/}
+
+In order to sort data points into these three categories formally, DBSCAN requires two parameters to be defined:
+* \epsilon: the radius of a neighborhood around a data point (this defines our idea of “nearby”)
+* minPts: the minimum number of data points (this defines our idea of “a lot”)
+
+Formally,
+1. a point p is a core point if there are at least minPts other data points within \epsilon of p.
+2. a point p is a border point if it is not a core point but is within \epsilon a core point,
+3. a point p is an outlier if it is neither a core point nor a border point.
+
+Once we have all of our data points labeled as core, border, or outlier, we can construct clusters. This is performed in a very straightforward manner. Essentially, core points that can reach each other by any number of jumps between core points of hop length \epsilon or less are labeled as belonging to a particular cluster. Then, any border points are labeled as belonging to the same cluster as the core point in their \epsilon neighborhood. {cite DBSCAN DOMINO}
+
+#### DBSCAN Advantages {cite Wikipedia}
+* No need to specify number of clusters
+* Flexible to cluster shape (can recognize lots of different cluster shapes)
+* Robust to outliers and noise
+* Just two parameters, both of which have intuitive interpretations
+
+#### DBSCAN Disadvantages {cite Wikipedia}
+* Depends on distance metric between points, which may become less effective for high-dimensional data
+* Outcome highly sensitive to parameter settings
+* Stumbles when clustering datasets where clusters have large differences in density
+
+#### Coding From the Can
+The DBSCAN R package contains a convenient implementation of the DBSCAN density-based cluster analysis algorithm.
 
 ##Assessing Cluster Quality
 The quality of a clustering decision can be assessed in two main ways:
